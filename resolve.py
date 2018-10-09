@@ -7,7 +7,8 @@ from email.mime.multipart import MIMEMultipart
 from email.header import Header
 from email.utils import formataddr
 
-#Usage: resolve ticxket --reset
+#Usage: resolve ticket username --reset
+# username is DB username
 # if --reset then do unlock and reset and send email accordingly
 #
 # read from arguments jira ticket
