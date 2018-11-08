@@ -2,6 +2,8 @@ from jira.client import JIRA
 import base64
 import yaml
 import smtplib
+import datetime
+from html.parser import HTMLParser
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
@@ -20,18 +22,25 @@ from email.utils import formataddr
 
 #templates
 
+
 def send_email():
     msg = MIMEMultipart()
-    fromemail = 'mcarras2@illinois.edu'
-    toemail = 'mgckind@gmail.com'
+    fromemail = 'audreyk@illinois.edu'
+    toemail = 'audrey@koziol.cc'
     server = 'smtp.ncsa.illinois.edu'
     s = smtplib.SMTP(server)
     msg['Subject'] = 'DESDM Account'
     msg['From'] = formataddr((str(Header('DESDM Release Team', 'utf-8')), fromemail))
     msg['To'] = fromemail
-    body = "Password was reset to <b> test</b> <br> Thanks "
-    msg.attach(MIMEText(body, 'html'))
-    s.sendmail(fromemail, toemail, msg.as_string())
+    with open("emailbody.html") as file: 
+        file_contents = file.read()
+    name = "Audrey"
+    password = "user password"
+    date = datetime.datetime.now()
+    email_body = file_contents.format(Username=name, password = password, date = date)    
+    #body = "Password was reset to <b> test</b> <br> Thanks "
+    #msg.attach(MIMEText(body, 'html'))
+    s.sendmail(fromemail, toemail, email_body)
     s.quit()
 
 
