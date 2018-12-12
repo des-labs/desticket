@@ -15,7 +15,7 @@ import argparse
 
 
 def unlock(user, db, reset=True):
-    print('Reseting password in {} ...'.format(db))
+    print('[ ... ] Reseting password in {} ...'.format(db))
     con = ea.connect(db)
     done = False
     if reset:
@@ -32,7 +32,7 @@ def unlock(user, db, reset=True):
 
 
 def send_email(name, username, email, reset):
-    msg = MIMEMultipart()
+    msg = MIMEMultipart('alternative')
     fromemail = 'mcarras2@illinois.edu'
     toemail = email
     server = 'smtp.ncsa.illinois.edu'
@@ -47,18 +47,17 @@ def send_email(name, username, email, reset):
         with open("templates/unlock.html") as file:
             file_contents = file.read()
     email_body = file_contents.format(name=name, user=username, user2=username[0:3])
-    print('Emailing {} at {}'.format(name, toemail))
-    #body = "Password was reset to <b> test</b> <br> Thanks "
-    #msg.attach(MIMEText(body, 'html'))
-    #s.sendmail(fromemail, toemail, email_body)
-    #s.quit()
-    with open('test.html', 'w') as test:
-        test.write(email_body)
-    return email_body
+    msg.attach(MIMEText(email_body, 'html'))
+    print('[ ... ] Emailing {} at {}'.format(name, toemail))
+    s.sendmail(fromemail, toemail, msg.as_string())
+    s.quit()
+    # with open('test.html', 'w') as test:
+    #    test.write(email_body)
+    # return email_body
 
 
 def read_ticket(ticket):
-    print('Gathering information from DESHELP-{}'.format(ticket))
+    print('[ ... ] Gathering information from DESHELP-{}'.format(ticket))
     with open('access.yaml', 'r') as cfile:
         conf = yaml.load(cfile)['jira']
     u = base64.b64decode(conf['uu']).decode().strip()
@@ -77,7 +76,7 @@ def read_ticket(ticket):
 
 
 def resolve_ticket(ticket):
-    print('Closing DESHELP-{}'.format(ticket))
+    print('[ ... ] Closing DESHELP-{}'.format(ticket))
     with open('access.yaml', 'r') as cfile:
         conf = yaml.load(cfile)['jira']
     u = base64.b64decode(conf['uu']).decode().strip()
@@ -85,9 +84,12 @@ def resolve_ticket(ticket):
     jira = JIRA(server='https://opensource.ncsa.illinois.edu/jira/',
                 basic_auth=(u, p))
     j = jira.search_issues('key=DESHELP-{}'.format(ticket))[0]
-    jira.assign_issue(j, 'desdm-wufoo')
-    jira.add_comment(j, 'email sent')
-    jira.transition_issue(j, '2')
+    try:
+        jira.assign_issue(j, 'desdm-wufoo')
+        jira.add_comment(j, 'email sent')
+        jira.transition_issue(j, '2')
+    except:
+        pass
 
 
 def run_all(ticket, user, reset=True):
@@ -106,7 +108,7 @@ def run_all(ticket, user, reset=True):
         return
     send_email(name, user, email, reset)
     resolve_ticket(ticket)
-    print('All Done!')
+    print('[ ... ] All Done!')
 
 
 if __name__ == '__main__':
@@ -121,6 +123,6 @@ if __name__ == '__main__':
     reset = not args.just_unlock
     action = 'Unlock and reset' if reset else 'Just unlock'
     print()
-    print('{} password for {}. Ticket DESHELP-{} ...'.format(action, username, ticket))
+    print('[ ... ] {} password for {}. Ticket DESHELP-{} ...'.format(action, username, ticket))
     print()
     run_all(ticket, username, reset)
