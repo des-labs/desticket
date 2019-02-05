@@ -129,8 +129,8 @@ def run_manual(user, reset=True, email='', name=''):
     print('[ ... ] All Done!')
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Resolve ticket')
-    parser.add_argument('ticket', help="Just the ticket number fro JIRA DESHELP-NNN, e.g.: 333")
+    parser = argparse.ArgumentParser(description='Resolve ticket, for manually entered ticket use 0')
+    parser.add_argument('ticket', help="Just the ticket number from JIRA DESHELP-NNN, e.g.: 333, use 0 for manual entry")
     parser.add_argument('username', help="DB username")
     parser.add_argument('--just_unlock', '-ju', help="just unlock but do not reset password")
     parser.add_argument('--email', help="manually entered email")
