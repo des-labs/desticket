@@ -8,22 +8,12 @@ class EnterText(Form):
 @app.route('/',methods=['POST','GET'])
 @app.route('/index',methods=['POST','GET'])
 def index():
-    message = None
     form = EnterText(request.form)
     if request.method == 'POST':
         text = request.form['username']
-    else:
-        text = None
 
     if form.validate():
-        print(text)
-        #exists = query.main(text)
-        if text =='mjohns44':
-            exists = True
-        else:
-            exists = False
-
-        print(exists)
+        exists = query.main(text)
         return redirect(url_for('form_submitted',user=text,exists = exists))
     
     return render_template('index.html')
