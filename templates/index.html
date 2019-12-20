@@ -1,0 +1,24 @@
+<! DOCTYPE html>
+<html>
+<head>
+<center id=images>
+<img src="{{ url_for('static', filename = 'des_logo_horizontal.png') }}" height=150>
+<h2>DESDM HELP User Password Reset Tool</h2>
+</center>
+<script type="text/javascript">
+    function getUsername() {
+        var username = document.getElementById('username').value;
+        alert(username);
+    }
+</script>
+</head>
+
+<body>
+<h3>Please enter the username below:</h3>
+<form>
+<p>Username: <input type="text" id="username"/>
+<input type="submit" onclick="getUsername();"/></p>
+</form>
+
+</body>
+</html>
