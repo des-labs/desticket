@@ -9,7 +9,9 @@
 
 <body>
 {% if exists=='True' %}
-<h2> <font color="green">{{user}}</font> exists! Click to reset password <input type="submit" value="reset"></h2>
+<form method='POST'>
+<h2><font color="green">{{user}}</font> exists! Click to reset password <input type="submit" name="reset" value="reset"></h2>
+</form>
 {% else %}
 <h2> <font color="red">{{user}}</font> does not exist!</h2>
 {% endif %}

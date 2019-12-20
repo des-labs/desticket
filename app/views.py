@@ -1,9 +1,12 @@
 from flask import render_template,request,url_for,redirect,session
-from wtforms import Form,validators, StringField
-from app import app,query
+from wtforms import Form,validators, StringField,SubmitField
+from app import app,query,resolve
 
 class EnterText(Form):
     username = StringField(validators=[validators.InputRequired()])
+
+class ResetButton(Form):
+    button = SubmitField()
 
 @app.route('/',methods=['POST','GET'])
 @app.route('/index',methods=['POST','GET'])
@@ -20,4 +23,7 @@ def index():
 
 @app.route('/form_submitted/<user>/<exists>')
 def form_submitted(user=None,exists=None):
+    form = ResetButton(request.form)
+    #if request.method=='POST':
+        
     return render_template('form_submitted.html',user=user,exists=exists)
