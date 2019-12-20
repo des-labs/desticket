@@ -8,15 +8,12 @@
 </head>
 
 <body>
-<h3>Please enter the username below:</h3>
-<form method='POST'>
-<p>Username: <input type="text" name="username" id="usernameTxtBx"/>
-<input type="submit" /></p>
-</form>
-
-{% if message %}
-<p> {{message}} </p>
+{% if exists=='True' %}
+<h2> <font color="green">{{user}}</font> exists! Password is reset. </h2>
+{% else %}
+<h2> <font color="red">{{user}}</font> does not exist!</h2>
 {% endif %}
+<p> To reset another password click <a href={{url_for('index')}}>here</a><p>
 </body>
 </html>
 
