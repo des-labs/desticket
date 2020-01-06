@@ -6,7 +6,7 @@ class EnterText(Form):
     username = StringField(validators=[validators.InputRequired()])
 
 class ResetButton(Form):
-    button = SubmitField()
+    button = SubmitField(label='reset')
 
 @app.route('/',methods=['POST','GET'])
 @app.route('/index',methods=['POST','GET'])
@@ -21,9 +21,16 @@ def index():
     
     return render_template('index.html')
 
-@app.route('/form_submitted/<user>/<exists>')
+@app.route('/form_submitted/<user>/<exists>',methods=['POST','GET'])
 def form_submitted(user=None,exists=None):
     form = ResetButton(request.form)
-    #if request.method=='POST':
+    if request.method=='POST':
+        text = resolve.heyyall()
+        return redirect(url_for('passwd_reset',user=user,text=text))
         
     return render_template('form_submitted.html',user=user,exists=exists)
+
+@app.route('/passwd_reset/<user>/<text>',methods=['POST','GET'])
+def passwd_reset(user=None,text=None):
+    return render_template('passwd_reset.html',user=user,text=text)
+

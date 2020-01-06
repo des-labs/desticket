@@ -14,7 +14,6 @@ from email.header import Header
 from email.utils import formataddr
 import argparse
 
-
 def unlock(user, db, reset=True):
     print('[ ... ] Reseting password in {} ...'.format(db))
     con = ea.connect(db)

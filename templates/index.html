@@ -1,12 +1,5 @@
+{% extends "header.html" %}
 {% block content %}
-<html>
-<head>
-<center id=images>
-<img src="{{ url_for('static', filename = 'des_logo_horizontal.png') }}" height=150>
-<h2>DESDM HELP: User Password Reset Tool</h2>
-</center>
-</head>
-
 <body>
 <h3>Please enter the username below:</h3>
 <form method='POST'>
@@ -14,6 +7,5 @@
 <input type="submit" /></p>
 </form>
 </body>
-</html>
 
 {% endblock %}

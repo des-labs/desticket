@@ -1,22 +1,15 @@
-{% block content %}
-<html>
-<head>
-<center id=images>
-<img src="{{ url_for('static', filename = 'des_logo_horizontal.png') }}" height=150>
-<h2>DESDM HELP: User Password Reset Tool</h2>
-</center>
-</head>
+{% extends "header.html" %}
 
+{% block content %}
 <body>
 {% if exists=='True' %}
 <form method='POST'>
-<h2><font color="green">{{user}}</font> exists! Click to reset password <input type="submit" name="reset" value="reset"></h2>
+<h2><font color="green">{{user}}</font> exists! Click to reset password 
+    <input id="ResetButton" type="submit" name="reset" value="Reset"> </h2>
 </form>
 {% else %}
 <h2> <font color="red">{{user}}</font> does not exist!</h2>
 {% endif %}
 <p> To reset another password click <a href={{url_for('index')}}>here</a><p>
 </body>
-</html>
-
 {% endblock %}
