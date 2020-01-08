@@ -2,13 +2,14 @@
 
 {% block content %}
 <body>
-{% if exists=='True' %}
+{% if request.args.get('count') == '1' %}
 <form method='POST'>
-<h2><font color="green">{{user}}</font> exists! Click to reset password 
+<h2><font color="green">{{request.args.get('user')}}</font> exists! Click to reset password 
     <input id="ResetButton" type="submit" name="reset" value="Reset"> </h2>
 </form>
-{% else %}
-<h2> <font color="red">{{user}}</font> does not exist!</h2>
+{% endif %}
+{% if request.args.get('count') == '0' %}
+<h2> <font color="red">{{request.args.get('user')}}</font> does not exist!</h2>
 {% endif %}
 <p> To reset another password click <a href={{url_for('index')}}>here</a><p>
 </body>

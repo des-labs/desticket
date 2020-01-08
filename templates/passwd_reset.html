@@ -3,7 +3,7 @@
 
 <body>
 
-<h2> Password reset for {{user}}! </h2>
+<h2> {{ request.args.get('text')}} </h2>
 
 <p> To reset another password click <a href={{url_for('index')}}>here</a><p>
 
