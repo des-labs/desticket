@@ -120,13 +120,17 @@ def run_manual(user, reset=True, email='', name=''):
         print('dessci')
         print(msg)
         print('** ERROR **')
-        return
+        #return
+        raise Exception(msg)
     check, msg = unlock(user, 'desoper', reset)
+    print(msg)
     if not check:
         print('desoper')
         print(msg)
         print('** ERROR **')
-        return
+        #return
+        raise Exception(msg)
+
     send_email(name, user, email, reset)
     print('[ ... ] All Done!')
 

@@ -54,12 +54,13 @@ def form_submitted(user=None,email=None,jira_ticket=None, count=None):
                 return redirect(url_for('passwd_reset',user=user, email= email, text=message))
             elif len(issues) == 0:
                 message = "No ticket found for {user}!".format(user=user)
-                return redirect(url_for('passwd_reset',user=user, text = message))
+                return redirect(url_for('manual_reset',user=user, text = message))
             else:
                 ticket = issues[0].key.split('-')[1]
         # run resolve here...
         try:
-            resolve.run_all(ticket,user)    
+            #resolve.run_all(ticket,user)    
+            resolve.run_manual('diwen2', email = 'mjohns44@illinois.edu', name = 'Di Wen')
             message = "Ticket DESHELP-{tix} resolved and {user} password had been reset!".format(
                     tix=ticket, user= user)
             return redirect(url_for('passwd_reset',user=user,text=message))
@@ -86,3 +87,12 @@ def search():
             
     return render_template('search.html')
 
+@app.route('/manual_reset',methods=['POST','GET'])
+def manual_rest():
+    form = Manual(request.form)
+    if request.method == 'POST':
+        input_name = request.form('name')
+        input_email = request.form('email')
+
+    if form.validate():
+        resolve.run_manual(
