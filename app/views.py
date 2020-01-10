@@ -43,13 +43,13 @@ def index(message=None):
 
     if form.validate():
         query_dict = query.main(username = input_username, email = input_email)
-        return redirect(url_for('form_submitted',user=query_dict['user'],
+        return redirect(url_for('form_submission',user=query_dict['user'],
                 email=query_dict['email'],count=query_dict['count'],jira_ticket=input_jira))
     
     return render_template('index.html',message=message)
 
-@app.route('/form_submitted',methods=['POST','GET'])
-def form_submitted(user=None,email=None,jira_ticket=None,count=None):
+@app.route('/form_submission',methods=['POST','GET'])
+def form_submission(user=None,email=None,jira_ticket=None,count=None):
     form = ResetButton(request.form)
     if request.method=='POST':
         reset = form.reset.data
@@ -74,12 +74,12 @@ def form_submitted(user=None,email=None,jira_ticket=None,count=None):
                 ticket = issues[0].key.split('-')[1]
         # run resolve here...
         try:
-            if reset:
+            if reset == 'True':
                 resolve.run_all(ticket,user)    
+                message = "Ticket {ticket} has been resolved. Passwords reset/account unlocked for {user}!".format(ticket =ticket, user = user)
             else:
                 resolve.run_all(ticket,user,reset=False)
-            message = "Ticket {ticket} has been resolved and {user}'s passwords have been reset!".format(
-                        ticket =ticket, user = user)
+                message = "Ticket {ticket} has been resolved. Account unlocked for {user}!".format(ticket =ticket, user = user)
             return redirect(url_for('passwd_reset',user=user,text=message))
         except:
             message = "Failed to resolve DESHELP-{tix} for {user}: \
@@ -87,7 +87,7 @@ def form_submitted(user=None,email=None,jira_ticket=None,count=None):
             return redirect(url_for('passwd_reset',user=user,text=message))
 
 
-    return render_template('form_submitted.html',user=user,email = email, count=count)
+    return render_template('form_submission.html',user=user,email = email, count=count,jira_ticket = jira_ticket)
 
 @app.route('/passwd_reset/<user>',methods=['POST','GET'])
 def passwd_reset(user=None,text=None):
@@ -105,7 +105,7 @@ def search():
     return render_template('search.html')
 
 @app.route('/manual_reset/<user>',methods=['POST','GET'])
-def manual_reset(user=None,unlock=False,reset=False):
+def manual_reset(user=None,unlock=True,reset=False):
     form = Manual(request.form)
     if request.method == 'POST':
         input_name = request.form['name']
@@ -115,14 +115,16 @@ def manual_reset(user=None,unlock=False,reset=False):
 
     if form.validate():
         try:
-            if input_reset:
+            if input_reset == 'True':
                 resolve.run_manual(user = user, email = input_email, name = input_name)
+                message = "Password reset/account unlocked for {user}!".format(user= user)
             else: 
-                resolve.run_manual(user = user, email = input_email, name = input_name, reset = False)
-            message = "Password has been reset for {user}!".format(user= user)
+                resolve.run_manual(user = user, reset=False, email = input_email, name = input_name)
+                message = "Account unlocked for {user}!".format(user= user)
+
             return redirect(url_for('passwd_reset',user=user,text=message))
         except:
-            message = "Failed to reset password for {user}: \
+            message = "Failed to reset password/unlock account for {user}: \
                        {errcls}:{err}!".format(user = user, errcls = sys.exc_info()[0],
                                                err =sys.exc_info()[1])
             return redirect(url_for('passwd_reset',user=user,text=message))

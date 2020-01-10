@@ -6,12 +6,12 @@ import base64
 from contextlib import redirect_stdout
 from app import app
 
-def connect_to_db():
+def connect_to_db(db='desoper'):
     with open(app.config['ACCESS_PATH'], 'r') as cfile:
         conf = yaml.load(cfile)['oracle']
     u = base64.b64decode(conf['uu']).decode().strip()
     p = base64.b64decode(conf['pp']).decode().strip()
-    dbh = ea.connect(user=u, passwd=p,quiet=True)
+    dbh = ea.connect(db, user=u, passwd=p, quiet=True)
     cur= dbh.cursor()
     return (dbh,cur)
 

@@ -6,6 +6,7 @@ import smtplib
 import datetime
 import easyaccess as ea
 import io
+import os
 import contextlib
 from html.parser import HTMLParser
 from email.mime.text import MIMEText
@@ -17,7 +18,7 @@ from app import app,query
 
 def unlock(user, db, reset=True):
     print('[ ... ] Reseting password in {} ...'.format(db))
-    con = query.connect_to_db()[0]
+    con = query.connect_to_db(db)[0]
     done = False
     if reset:
         cmd = "unlockuser({},'reset')".format(user)
@@ -42,10 +43,10 @@ def send_email(name, username, email, reset):
     msg['From'] = formataddr((str(Header('DESDM Release Team', 'utf-8')), fromemail))
     msg['To'] = toemail
     if reset:
-        with open("templates/reset.html") as file:
+        with open(os.path.join(app.config["TEMPLATES_PATH"],'reset.html')) as file:
             file_contents = file.read()
     else:
-        with open("templates/unlock.html") as file:
+        with open(os.path.join(app.config["TEMPLATES_PATH"],"unlock.html")) as file:
             file_contents = file.read()
     email_body = file_contents.format(name=name, user=username, user2=username[0:3])
     msg.attach(MIMEText(email_body, 'html'))
