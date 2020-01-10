@@ -13,11 +13,11 @@ from email.mime.multipart import MIMEMultipart
 from email.header import Header
 from email.utils import formataddr
 import argparse
-from app import app
+from app import app,query
 
 def unlock(user, db, reset=True):
     print('[ ... ] Reseting password in {} ...'.format(db))
-    con = ea.connect(db)
+    con = query.connect_to_db()[0]
     done = False
     if reset:
         cmd = "unlockuser({},'reset')".format(user)
