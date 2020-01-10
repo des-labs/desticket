@@ -1,5 +1,5 @@
 from flask import render_template,request,url_for,redirect,session
-from wtforms import Form,validators, StringField,SubmitField
+from wtforms import Form,validators, StringField,SubmitField,BooleanField
 from app import app,query,resolve, jiracmd
 import sys
 
@@ -14,7 +14,15 @@ class EnterText(Form):
         return True
 
 class ResetButton(Form):
-    button = SubmitField(label='reset')
+    reset = BooleanField(label='reset',validators=[validators.Optional()])
+    unlock = BooleanField(label='unlock',validators=[validators.Optional()])
+    
+    def validate(self):
+        if self.reset.data is True and self.unlock.data is True:
+            return False
+        if self.reset.data is False and self.unlock.data is False:
+            return False
+        return True
 
 class Search(Form):
     search = StringField(label='search', validators=[validators.InputRequired()])
@@ -22,6 +30,7 @@ class Search(Form):
 class Manual(Form):
     name = StringField(label='name', validators=[validators.InputRequired()])
     email = StringField(label='email',validators=[validators.InputRequired()])
+    unlock = BooleanField(label='unlock',validators=[validators.Optional()])
 
 @app.route('/',methods=['POST','GET'])
 @app.route('/index',methods=['POST','GET'])
@@ -35,17 +44,19 @@ def index(message=None):
     if form.validate():
         query_dict = query.main(username = input_username, email = input_email)
         return redirect(url_for('form_submitted',user=query_dict['user'],
-                email=query_dict['email'],count=query_dict['count']))
+                email=query_dict['email'],count=query_dict['count'],jira_ticket=input_jira))
     
     return render_template('index.html',message=message)
 
 @app.route('/form_submitted',methods=['POST','GET'])
-def form_submitted(user=None,email=None,jira_ticket=None, count=None):
+def form_submitted(user=None,email=None,jira_ticket=None,count=None):
     form = ResetButton(request.form)
     if request.method=='POST':
-        user = request.args.get('user')
-        email = request.args.get('email')
-        jira = jiracmd.Jira('jira-desdm')
+        reset = form.reset.data
+        unlock = form.unlock.data
+
+    if form.validate():
+        jira = jiracmd.Jira()
         if jira_ticket:
             ticket = str(jira_ticket)
         else:
@@ -54,14 +65,22 @@ def form_submitted(user=None,email=None,jira_ticket=None, count=None):
                 message = "There are more than one open issues! Please resubmit form \
                            and specify the ticket number.\n \
                            {results}".format(results=[key.key for key in iss])
-                return redirect(url_for('passwd_reset',user=user, email= email, text=message))
+                return redirect(url_for('passwd_reset',user=request.args.get('user'), 
+                        email= request.args.get('email'), text=message))
             elif len(issues) == 0:
-                return redirect(url_for('manual_reset',user=user))
+                return redirect(url_for('manual_reset',user=request.args.get('user'),reset=reset,
+                        unlock=unlock))
             else:
                 ticket = issues[0].key.split('-')[1]
         # run resolve here...
         try:
-            resolve.run_all(ticket,user)    
+            if reset:
+                resolve.run_all(ticket,user)    
+            else:
+                resolve.run_all(ticket,user,reset=False)
+            message = "Ticket {ticket} has been resolved and {user}'s passwords have been reset!".format(
+                        ticket =ticket, user = user)
+            return redirect(url_for('passwd_reset',user=user,text=message))
         except:
             message = "Failed to resolve DESHELP-{tix} for {user}: \
                        {errcls}:{err}!".format(tix=ticket, user = user, errcls = sys.exc_info()[0],err =sys.exc_info()[1])
@@ -86,15 +105,20 @@ def search():
     return render_template('search.html')
 
 @app.route('/manual_reset/<user>',methods=['POST','GET'])
-def manual_reset(user=None):
+def manual_reset(user=None,unlock=False,reset=False):
     form = Manual(request.form)
     if request.method == 'POST':
         input_name = request.form['name']
         input_email = request.form['email']
+        input_reset = request.args.get('reset')
+        input_unlock = request.args.get('unlock')
 
     if form.validate():
         try:
-            resolve.run_manual(user = user, email = input_email, name = input_name)
+            if input_reset:
+                resolve.run_manual(user = user, email = input_email, name = input_name)
+            else: 
+                resolve.run_manual(user = user, email = input_email, name = input_name, reset = False)
             message = "Password has been reset for {user}!".format(user= user)
             return redirect(url_for('passwd_reset',user=user,text=message))
         except:

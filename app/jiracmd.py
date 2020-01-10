@@ -4,23 +4,18 @@ import os
 import sys
 from jira.client import JIRA
 import configparser
+import yaml
+import base64
+from app import app
 
 class Jira:
-    def __init__(self,section):
-        parser = configparser.ConfigParser()
-        services_path = os.getenv('DES_SERVICES')
-        if not services_path:
-            services_path = os.path.join(os.getenv('HOME'),'.desservices.ini')
-        with open(services_path) as configfile:
-            parser.read_file(configfile)
-        jiradict=parser[section]
-        jirauser=jiradict['user']
-        jirapasswd=jiradict['passwd']
-        jiraserver=jiradict['server']
-        jira=JIRA(options={'server':jiraserver},basic_auth=(jirauser,jirapasswd))
+    def __init__(self):
+        with open(app.config['ACCESS_PATH'], 'r') as cfile:
+            conf = yaml.load(cfile)['jira']
+        u = base64.b64decode(conf['uu']).decode().strip()
+        p = base64.b64decode(conf['pp']).decode().strip()
+        jira=JIRA(options={'server': 'https://opensource.ncsa.illinois.edu/jira'},basic_auth=(u,p))
         self.jira = jira
-        self.server = jiraserver
-        self.user = jirauser
 
     def search_for_issue(self,email):
         jql = 'summary ~ "Help with DESDM account" \

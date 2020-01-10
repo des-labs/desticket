@@ -3,8 +3,16 @@
 {% block content %}
 {% if request.args.get('count') == '1' %}
 <form method='POST'>
-<h2><font color="green">{{request.args.get('user')}}</font> exists! Click to reset password 
-    <input id="ResetButton" type="submit" name="reset" value="Reset"> </h2>
+<h2><font color="green">{{request.args.get('user')}}</font> exists! Click options to reset/unlock passwords:</h2>
+<div>
+    <input id="reset" type="checkbox" name="reset">
+    <label for="rest">Reset/Unlock</label>
+</div>
+<div>
+    <input id="unlock" type="checkbox" name="unlock" value="Unlock Only">
+    <label for="unlock">Unlock Only</label>
+</div>
+    <input id="submit" type="submit" name="submit" value="Submit"></h2>
 </form>
 {% endif %}
 {% if request.args.get('count') == '0' %}
