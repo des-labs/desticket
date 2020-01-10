@@ -123,7 +123,6 @@ def run_manual(user, reset=True, email='', name=''):
         #return
         raise Exception(msg)
     check, msg = unlock(user, 'desoper', reset)
-    print(msg)
     if not check:
         print('desoper')
         print(msg)

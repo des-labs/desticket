@@ -18,11 +18,14 @@ class ResetButton(Form):
 
 class Search(Form):
     search = StringField(label='search', validators=[validators.InputRequired()])
+    
+class Manual(Form):
+    name = StringField(label='name', validators=[validators.InputRequired()])
+    email = StringField(label='email',validators=[validators.InputRequired()])
 
 @app.route('/',methods=['POST','GET'])
 @app.route('/index',methods=['POST','GET'])
 def index(message=None):
-    print(message)
     form = EnterText(request.form)
     if request.method == 'POST':
         input_username = request.form['username']
@@ -53,17 +56,12 @@ def form_submitted(user=None,email=None,jira_ticket=None, count=None):
                            {results}".format(results=[key.key for key in iss])
                 return redirect(url_for('passwd_reset',user=user, email= email, text=message))
             elif len(issues) == 0:
-                message = "No ticket found for {user}!".format(user=user)
-                return redirect(url_for('manual_reset',user=user, text = message))
+                return redirect(url_for('manual_reset',user=user))
             else:
                 ticket = issues[0].key.split('-')[1]
         # run resolve here...
         try:
-            #resolve.run_all(ticket,user)    
-            resolve.run_manual('diwen2', email = 'mjohns44@illinois.edu', name = 'Di Wen')
-            message = "Ticket DESHELP-{tix} resolved and {user} password had been reset!".format(
-                    tix=ticket, user= user)
-            return redirect(url_for('passwd_reset',user=user,text=message))
+            resolve.run_all(ticket,user)    
         except:
             message = "Failed to resolve DESHELP-{tix} for {user}: \
                        {errcls}:{err}!".format(tix=ticket, user = user, errcls = sys.exc_info()[0],err =sys.exc_info()[1])
@@ -87,12 +85,21 @@ def search():
             
     return render_template('search.html')
 
-@app.route('/manual_reset',methods=['POST','GET'])
-def manual_rest():
+@app.route('/manual_reset/<user>',methods=['POST','GET'])
+def manual_reset(user=None):
     form = Manual(request.form)
     if request.method == 'POST':
-        input_name = request.form('name')
-        input_email = request.form('email')
+        input_name = request.form['name']
+        input_email = request.form['email']
 
     if form.validate():
-        resolve.run_manual(
+        try:
+            resolve.run_manual(user = user, email = input_email, name = input_name)
+            message = "Password has been reset for {user}!".format(user= user)
+            return redirect(url_for('passwd_reset',user=user,text=message))
+        except:
+            message = "Failed to reset password for {user}: \
+                       {errcls}:{err}!".format(user = user, errcls = sys.exc_info()[0],
+                                               err =sys.exc_info()[1])
+            return redirect(url_for('passwd_reset',user=user,text=message))
+    return render_template('manual_reset.html',user= user)
