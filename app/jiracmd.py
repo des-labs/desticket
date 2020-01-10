@@ -25,7 +25,7 @@ class Jira:
     def search_for_issue(self,email):
         jql = 'summary ~ "Help with DESDM account" \
                and project = "DESHELP" \
-               and text ~ "Reset my passwords" \
+               and (text ~ "Reset my passwords" | text ~ "Forgot DB credentials") \
                and status = "Open" \
                and text ~ "Email: {email}"'.format(email=email)
         issue = self.jira.search_issues(jql)
@@ -41,5 +41,3 @@ class Jira:
         ticket = self.jira.create_issue(fields=ticket_dict)
         return ticket.key	
 
-    def add_jira_comment(self,issue,comment):
-        self.jira.add_comment(issue,comment)

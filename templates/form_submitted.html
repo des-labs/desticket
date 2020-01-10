@@ -1,7 +1,6 @@
 {% extends "header.html" %}
 
 {% block content %}
-<body>
 {% if request.args.get('count') == '1' %}
 <form method='POST'>
 <h2><font color="green">{{request.args.get('user')}}</font> exists! Click to reset password 
@@ -12,5 +11,4 @@
 <h2> <font color="red">{{request.args.get('user')}}</font> does not exist!</h2>
 {% endif %}
 <p> To reset another password click <a href={{url_for('index')}}>here</a><p>
-</body>
 {% endblock %}

@@ -13,6 +13,7 @@ from email.mime.multipart import MIMEMultipart
 from email.header import Header
 from email.utils import formataddr
 import argparse
+from app import app
 
 def unlock(user, db, reset=True):
     print('[ ... ] Reseting password in {} ...'.format(db))
@@ -58,7 +59,7 @@ def send_email(name, username, email, reset):
 
 def read_ticket(ticket):
     print('[ ... ] Gathering information from DESHELP-{}'.format(ticket))
-    with open('access.yaml', 'r') as cfile:
+    with open(app.config['ACCESS_PATH'], 'r') as cfile:
         conf = yaml.load(cfile)['jira']
     u = base64.b64decode(conf['uu']).decode().strip()
     p = base64.b64decode(conf['pp']).decode().strip()
@@ -77,7 +78,7 @@ def read_ticket(ticket):
 
 def resolve_ticket(ticket):
     print('[ ... ] Closing DESHELP-{}'.format(ticket))
-    with open('access.yaml', 'r') as cfile:
+    with open(app.config['ACCESS_PATH'], 'r') as cfile:
         conf = yaml.load(cfile)['jira']
     u = base64.b64decode(conf['uu']).decode().strip()
     p = base64.b64decode(conf['pp']).decode().strip()
@@ -99,13 +100,15 @@ def run_all(ticket, user, reset=True):
         print('dessci')
         print(msg)
         print('** ERROR **')
-        return
+        #return
+        raise Exception(msg)
     check, msg = unlock(user, 'desoper', reset)
     if not check:
         print('desoper')
         print(msg)
         print('** ERROR **')
-        return
+        #return
+        raise Exception(msg)
     send_email(name, user, email, reset)
     resolve_ticket(ticket)
     print('[ ... ] All Done!')
