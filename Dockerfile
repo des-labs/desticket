@@ -3,6 +3,13 @@
 # 
 #
 
+# Build from a parent image
+FROM oraclelinux:7-slim as oracle
+
+RUN  curl -o /etc/yum.repos.d/public-yum-ol7.repo https://yum.oracle.com/public-yum-ol7.repo && \
+     yum-config-manager --enable ol7_oracle_instantclient && \
+     yum -y install oracle-instantclient18.3-basic
+
 FROM ubuntu:18.04
 RUN apt-get update
 RUN apt-get install -y libaio1
@@ -24,5 +31,9 @@ RUN pip3 install flask
 RUN pip3 install wtforms
 RUN pip3 install gevent
 WORKDIR /home/des/desticket
-ENV HOME /home/des
+ENV PATH=$PATH:/usr/lib/oracle/18.3/client64/bin
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/oracle/18.3/client64/lib:/usr/lib
+COPY --from=oracle /usr/lib/oracle/ /usr/lib/oracle
+COPY --from=oracle /lib64/libaio.so.1 /usr/lib
+
 CMD ["/usr/bin/python3","/home/des/desticket/start_server.py"]
