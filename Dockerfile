@@ -23,7 +23,6 @@ RUN pip3 install pyaml
 RUN pip3 install flask
 RUN pip3 install wtforms
 RUN pip3 install gevent
-RUN pip3 install logging
 WORKDIR /home/des/desticket
 ENV HOME /home/des
 CMD ["/usr/bin/python3","/home/des/desticket/start_server.py"]
