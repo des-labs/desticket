@@ -1,0 +1,80 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: deslabs
+  name: desticket
+  labels:
+    app: desticket
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: desticket
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: desticket
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+      initContainers:
+        - name: vault-init
+          image:  "mdjohnson/vault-init:v7"
+          command: ["sh","-c","export VAULT_TOKEN=$(cat .certs/.token.txt |base64 -d); vault login -no-store token=$VAULT_TOKEN && vault kv get -field desticket.yaml des/desticket.yaml | base64 -d > /home/des/desticket/access.yaml"]
+          volumeMounts:
+          - name: config-all
+            mountPath: "/home/des/desticket"
+            subPath: "access.yaml"
+      containers:
+      - name: desticket
+        image: docker.io/mdjohnson/desticket:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: config-all
+          mountPath: "/home/des/desticket"
+          subPath: "access.yaml"
+      volumes:
+      - name: config-all
+        emptyDir: {}
+        
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: desticket
+  namespace: deslabs
+spec:
+  selector:
+    app: desticket
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+  type: NodePort
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: desticket
+  namespace: deslabs
+  annotations:
+    kubernetes.io/ingress.class: deslabs
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /desticket
+            backend:
+              serviceName: desticket
+              servicePort: 5000
+
