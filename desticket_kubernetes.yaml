@@ -27,7 +27,7 @@ spec:
       initContainers:
         - name: vault-init
           image:  "mdjohnson/vault-init:v7"
-          command: ["sh","-c","export VAULT_TOKEN=$(cat .certs/.token.txt |base64 -d); vault login -no-store token=$VAULT_TOKEN && vault kv get -field desticket.yaml des/desticket.yaml | base64 -d > /home/des/desticket/access.yaml"]
+          command: ["sh","-c","export VAULT_TOKEN=$(cat .certs/.token.txt |base64 -d); vault login -no-store token=$VAULT_TOKEN && vault kv get -field access.yaml des/desticket | base64 -d > /home/des/desticket/access.yaml"]
           volumeMounts:
           - name: config-all
             mountPath: "/home/des/desticket"
