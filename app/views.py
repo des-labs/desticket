@@ -32,7 +32,7 @@ class Manual(Form):
     email = StringField(label='email',validators=[validators.InputRequired()])
     unlock = BooleanField(label='unlock',validators=[validators.Optional()])
 
-@app.route('/desticket',methods=['POST','GET'])
+@app.route('/desticket/',methods=['POST','GET'])
 def index(message=None):
     form = EnterText(request.form)
     if request.method == 'POST':
@@ -47,7 +47,7 @@ def index(message=None):
     
     return render_template('index.html',message=message)
 
-@app.route('/desticket/form_submission',methods=['POST','GET'])
+@app.route('/desticket/form_submission/',methods=['POST','GET'])
 def form_submission(user=None,email=None,jira_ticket=None,count=None):
     form = ResetButton(request.form)
     if request.method=='POST':
@@ -88,11 +88,11 @@ def form_submission(user=None,email=None,jira_ticket=None,count=None):
 
     return render_template('form_submission.html',user=user,email = email, count=count,jira_ticket = jira_ticket)
 
-@app.route('/desticket//passwd_reset/<user>',methods=['POST','GET'])
+@app.route('/desticket//passwd_reset/<user>/',methods=['POST','GET'])
 def passwd_reset(user=None,text=None):
     return render_template('passwd_reset.html',user=user,text=text)
 
-@app.route('/desticket/search',methods=['POST','GET'])
+@app.route('/desticket/search/',methods=['POST','GET'])
 def search():
     form = Search(request.form)
     if request.method=='POST':
@@ -103,7 +103,7 @@ def search():
             
     return render_template('search.html')
 
-@app.route('/desticket/manual_reset/<user>',methods=['POST','GET'])
+@app.route('/desticket/manual_reset/<user>/',methods=['POST','GET'])
 def manual_reset(user=None,unlock=True,reset=False):
     form = Manual(request.form)
     if request.method == 'POST':
