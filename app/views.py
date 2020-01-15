@@ -56,18 +56,20 @@ def form_submission(user=None,email=None,jira_ticket=None,count=None):
 
     if form.validate():
         jira = jiracmd.Jira()
-        if jira_ticket:
+        jira_ticket=request.args.get('jira_ticket')
+        user = request.args.get('user')
+        if jira_ticket and jira_ticket !='None' and jira_ticket !='':
             ticket = str(jira_ticket)
         else:
-            issues = jira.search_for_issue(email)
+            issues = jira.search_for_issue(request.args.get('email'))
             if len(issues) > 1:
                 message = "There are more than one open issues! Please resubmit form \
                            and specify the ticket number.\n \
                            {results}".format(results=[key.key for key in iss])
-                return redirect(url_for('passwd_reset',user=request.args.get('user'), 
+                return redirect(url_for('passwd_reset',user=user, 
                         email= request.args.get('email'), text=message))
             elif len(issues) == 0:
-                return redirect(url_for('manual_reset',user=request.args.get('user'),reset=reset,
+                return redirect(url_for('manual_reset',user=user,reset=reset,
                         unlock=unlock))
             else:
                 ticket = issues[0].key.split('-')[1]
@@ -79,11 +81,11 @@ def form_submission(user=None,email=None,jira_ticket=None,count=None):
             else:
                 resolve.run_all(ticket,user,reset=False)
                 message = "Ticket {ticket} has been resolved. Account unlocked for {user}!".format(ticket =ticket, user = user)
-            return redirect(url_for('passwd_reset',user=user,text=message))
+            return redirect(url_for('passwd_reset',user=request.args.get('user'),text=message))
         except:
             message = "Failed to resolve DESHELP-{tix} for {user}: \
                        {errcls}:{err}!".format(tix=ticket, user = user, errcls = sys.exc_info()[0],err =sys.exc_info()[1])
-            return redirect(url_for('passwd_reset',user=user,text=message))
+            return redirect(url_for('passwd_reset',user=request.args.get('user'),text=message))
 
 
     return render_template('form_submission.html',user=user,email = email, count=count,jira_ticket = jira_ticket)

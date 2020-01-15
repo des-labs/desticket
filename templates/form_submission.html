@@ -18,5 +18,5 @@
 {% if request.args.get('count') == '0' %}
 <h2> <font color="red">{{request.args.get('user')}}</font> does not exist!</h2>
 {% endif %}
-<p> To reset another password click <a href={{url_for('index')}}>here</a><p>
+<p> To <strong>RESET</strong> another password click <a href={{url_for('index')}}>here</a><p>
 {% endblock %}
