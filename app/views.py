@@ -112,7 +112,6 @@ def manual_reset(user=None,unlock=True,reset=False):
         input_name = request.form['name']
         input_email = request.form['email']
         input_reset = request.args.get('reset')
-        input_unlock = request.args.get('unlock')
 
     if form.validate():
         try:
