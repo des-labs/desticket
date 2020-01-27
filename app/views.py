@@ -140,7 +140,7 @@ def api_search(search_text):
     return jsonify(results)
 
 @app.route('/desticket/api/v1/reset/',methods=['POST'])
-def api_reset(user=None, email=None, jira_ticket=None, reset=False, unlock=False):
+def api_reset(user, email, jira_ticket=None, reset=False, unlock=False):
     jira = jiracmd.Jira()
     if not jira_ticket:
         issues = jira.search_for_issue(email)
