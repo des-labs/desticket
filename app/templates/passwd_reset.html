@@ -1,0 +1,8 @@
+{% extends "header.html" %}
+{% block content %}
+
+<h2> {{ request.args.get('text')}} </h2>
+
+<p>To <strong>RESET</strong> another password click <a href={{url_for('index')}}>here</a><p>
+
+{% endblock %}
