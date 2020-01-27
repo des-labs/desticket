@@ -65,7 +65,7 @@ def form_submission(user=None,email=None,jira_ticket=None,count=None):
             if len(issues) > 1:
                 message = "There are more than one open issues! Please resubmit form \
                            and specify the ticket number.\n \
-                           {results}".format(results=[key.key for key in iss])
+                           {results}".format(results=[key.key for key in issues])
                 return redirect(url_for('passwd_reset',user=user, 
                         email= request.args.get('email'), text=message))
             elif len(issues) == 0:
@@ -147,7 +147,7 @@ def api_reset(user, email, jira_ticket=None, reset=False, unlock=False):
         if len(issues) > 1:
             message = "There are more than one open issues! Please resubmit form \
                        and specify the ticket number.\n \
-                       {results}".format(results=[key.key for key in iss])
+                       {results}".format(results=[key.key for key in issues])
         elif len(issues) == 0:
             try:
                 if reset == 'True':
@@ -158,7 +158,7 @@ def api_reset(user, email, jira_ticket=None, reset=False, unlock=False):
                     message = "Account unlocked for {user}!".format(user= user)
             except:
                 message = "Failed to resolve DESHELP-{tix} for {user}: \
-                   {errcls}:{err}!".format(tix=ticket, user = user, errcls = sys.exc_info()[0],err =sys.exc_info()[1])
+                   {errcls}:{err}!".format(user = user, errcls = sys.exc_info()[0],err =sys.exc_info()[1])
 
         else:
             ticket = issues[0].key.split('-')[1]
