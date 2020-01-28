@@ -132,14 +132,25 @@ def manual_reset(user=None,unlock=True,reset=False):
 
 
 ### API CALLS ###
+@app.route('/desticket/api/vi/exists/',methods=['POST'])
+def api_exists(user,email,jira_ticket):
+    query_dict = query.main(username = request.args.get('user'), email = request.args.get('email'))
+    query_dict['jira_ticket'] = request.args.get('jira_ticket')
+  
+    return jsonify(query_dict)
+
 @app.route('/desticket/api/v1/search/<search_text>',methods=['GET'])
 def api_search(search_text):
     results = {'message': query.search(search_text)}
    
     return jsonify(results)
 
-@app.route('/desticket/api/v1/reset/',methods=['POST'])
-def api_reset(user, email, jira_ticket=None, reset=False, unlock=False):
+@app.route('/desticket/api/v1/reset/<user>',methods=['GET'])
+def api_reset():
+    user = request.args.get('user')
+    email = request.args.get('email')
+    jira_ticket = request.args.get('jira_ticket')
+    reset = request.args.get('reset')
     jira = jiracmd.Jira()
     if not jira_ticket:
         issues = jira.search_for_issue(email)
@@ -156,7 +167,7 @@ def api_reset(user, email, jira_ticket=None, reset=False, unlock=False):
                     resolve.run_manual(user = user, reset=False, email = email, name = user)
                     message = "Account unlocked for {user}!".format(user= user)
             except:
-                message = "Failed to resolve DESHELP-{tix} for {user}: \
+                message = "Failed to resolve account for {user}: \
                    {errcls}:{err}!".format(user = user, errcls = sys.exc_info()[0],err =sys.exc_info()[1])
 
         else:
