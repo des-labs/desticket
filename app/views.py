@@ -132,7 +132,7 @@ def manual_reset(user=None,unlock=True,reset=False):
 
 
 ### API CALLS ###
-@app.route('/desticket/api/vi/exists/',methods=['POST'])
+@app.route('/desticket/api/v1/exists/<user>',methods=['GET','POST'])
 def api_exists(user,email,jira_ticket):
     query_dict = query.main(username = request.args.get('user'), email = request.args.get('email'))
     query_dict['jira_ticket'] = request.args.get('jira_ticket')
@@ -145,15 +145,19 @@ def api_search(search_text):
    
     return jsonify(results)
 
-@app.route('/desticket/api/v1/reset/<user>',methods=['GET'])
-def api_reset():
-    user = request.args.get('user')
-    email = request.args.get('email')
-    jira_ticket = request.args.get('jira_ticket')
-    reset = request.args.get('reset')
+@app.route('/desticket/api/v1/reset/<user>',methods=['GET','POST'])
+def api_reset(user):
+    email = request.get_json('email')
+    jira_ticket = request.get_json('jira_ticket')
+    reset = request.get_json('reset')
+    print(email,type(email))
+    print(jira_ticket,type(jira_ticket))
+    print(reset,type(reset))
     jira = jiracmd.Jira()
+    
     if not jira_ticket:
         issues = jira.search_for_issue(email)
+        ticket = None
         if len(issues) > 1:
             message = "There are more than one open issues! Please resubmit form \
                        and specify the ticket number.\n \
