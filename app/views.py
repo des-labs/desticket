@@ -132,10 +132,10 @@ def manual_reset(user=None,unlock=True,reset=False):
 
 
 ### API CALLS ###
-@app.route('/desticket/api/v1/exists/<user>',methods=['GET','POST'])
-def api_exists(user,email,jira_ticket):
-    query_dict = query.main(username = request.args.get('user'), email = request.args.get('email'))
-    query_dict['jira_ticket'] = request.args.get('jira_ticket')
+@app.route('/desticket/api/v1/exists/<user>/<email>/<jira_ticket>',methods=['GET'])
+def api_exists(user,email, jira_ticket):
+    query_dict = query.main(username = user, email = email)
+    query_dict['jira_ticket'] = jira_ticket
   
     return jsonify(query_dict)
 
@@ -145,48 +145,50 @@ def api_search(search_text):
    
     return jsonify(results)
 
-@app.route('/desticket/api/v1/reset/<user>',methods=['GET','POST'])
-def api_reset(user):
-    email = request.get_json('email')
-    jira_ticket = request.get_json('jira_ticket')
-    reset = request.get_json('reset')
-    print(email,type(email))
-    print(jira_ticket,type(jira_ticket))
-    print(reset,type(reset))
+@app.route('/desticket/api/v1/reset/<user>/<email>/<jira_ticket>/<reset>',methods=['GET'])
+def api_reset(user,email, jira_ticket, reset):
     jira = jiracmd.Jira()
-    
-    if not jira_ticket:
+    if jira_ticket=='None':
         issues = jira.search_for_issue(email)
         ticket = None
         if len(issues) > 1:
             message = "There are more than one open issues! Please resubmit form \
                        and specify the ticket number.\n \
                        {results}".format(results=[key.key for key in issues])
+            status = 1
         elif len(issues) == 0:
             try:
                 if reset == 'True':
                     resolve.run_manual(user = user, email = email, name = user)
                     message = "Password reset/account unlocked for {user}!".format(user= user)
+                    status = 0
                 else: 
                     resolve.run_manual(user = user, reset=False, email = email, name = user)
                     message = "Account unlocked for {user}!".format(user= user)
+                    status = 0
             except:
                 message = "Failed to resolve account for {user}: \
                    {errcls}:{err}!".format(user = user, errcls = sys.exc_info()[0],err =sys.exc_info()[1])
+                status = 1
 
         else:
             ticket = issues[0].key.split('-')[1]
+    else:
+        ticket = jira_ticket
     # run resolve here...
     if ticket:
         try:
             if reset == 'True':
                 resolve.run_all(ticket,user)    
                 message = "Ticket {ticket} has been resolved. Passwords reset/account unlocked for {user}!".format(ticket =ticket, user = user)
+                status = 0
             else:
                 resolve.run_all(ticket,user,reset=False)
                 message = "Ticket {ticket} has been resolved. Account unlocked for {user}!".format(ticket =ticket, user = user)
+                status = 0
         except:
             message = "Failed to resolve DESHELP-{tix} for {user}: \
                        {errcls}:{err}!".format(tix=ticket, user = user, errcls = sys.exc_info()[0],err =sys.exc_info()[1])
+            status = 1
 
-    return jsonify({'message': message})
+    return jsonify({'message': message,'status': status})
