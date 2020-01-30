@@ -19,6 +19,9 @@ def search_username(con,string):
     con[0].do_find_user(string)
     
 def query_user(con,email=None,username=None):
+    if not username and not email:
+        print('Must specify username and/or email')
+        sys.exit()
     if username:
         query = "SELECT username,email FROM des_users WHERE username='{username}'".format(username=username)
     if email and not username:
