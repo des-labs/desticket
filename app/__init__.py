@@ -6,8 +6,6 @@ import jinja2
 app = Flask(__name__,static_folder='static')
 
 app.config.from_pyfile("../settings.cfg")
-app.jinja_loader = jinja2.FileSystemLoader([app.config["TEMPLATES_PATH"],
-                                          ])
-
+app.jinja_loader = jinja2.FileSystemLoader([app.config["TEMPLATES_PATH"]])
 
 from app import views
