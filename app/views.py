@@ -2,6 +2,7 @@ from flask import render_template,request,url_for,redirect,jsonify
 from wtforms import Form,validators, StringField,SubmitField,BooleanField
 from app import app,query,resolve, jiracmd
 import sys
+import ast
 
 class EnterText(Form):
     username = StringField(label='user',validators=[validators.Optional()])
@@ -132,23 +133,33 @@ def manual_reset(user=None,unlock=True,reset=False):
 
 
 ### API CALLS ###
-@app.route('/desticket/api/v1/exists/<user>/<email>/<jira_ticket>',methods=['GET'])
-def api_exists(user,email, jira_ticket):
-    query_dict = query.main(username = user, email = email)
-    query_dict['jira_ticket'] = jira_ticket
+@app.route('/desticket/api/v1/exists/',methods=['GET'])
+def api_exists():
+    # user, email, jira_ticket
+    data = ast.literal_eval(request.data.decode('utf-8'))
+    query_dict = query.main(username = data['user'], email = data['email'])
+    query_dict['jira_ticket'] = data['jira_ticket']
   
     return jsonify(query_dict)
 
-@app.route('/desticket/api/v1/search/<search_text>',methods=['GET'])
-def api_search(search_text):
-    results = {'message': query.search(search_text)}
+@app.route('/desticket/api/v1/search/',methods=['GET'])
+def api_search():
+    data = ast.literal_eval(request.data.decode('utf-8'))
+    results = {'message': query.search(data['search_string'])}
    
     return jsonify(results)
 
-@app.route('/desticket/api/v1/reset/<user>/<email>/<jira_ticket>/<reset>',methods=['GET'])
-def api_reset(user,email, jira_ticket, reset):
+@app.route('/desticket/api/v1/reset/',methods=['GET'])
+def api_reset():
+    # user, email, jira_ticket, reset
+    data = ast.literal_eval(request.data.decode('utf-8'))
+    user = data['user']
+    email = data['email']
+    jira_ticket = data['jira_ticket']
+    reset = data['reset']
+
     jira = jiracmd.Jira()
-    if jira_ticket=='None':
+    if jira_ticket=='None' or not jira_ticket:
         issues = jira.search_for_issue(email)
         ticket = None
         if len(issues) > 1:
@@ -158,7 +169,7 @@ def api_reset(user,email, jira_ticket, reset):
             status = 1
         elif len(issues) == 0:
             try:
-                if reset == 'True':
+                if reset or reset == 'True':
                     resolve.run_manual(user = user, email = email, name = user)
                     message = "Password reset/account unlocked for {user}!".format(user= user)
                     status = 0
@@ -178,7 +189,7 @@ def api_reset(user,email, jira_ticket, reset):
     # run resolve here...
     if ticket:
         try:
-            if reset == 'True':
+            if reset or reset == 'True':
                 resolve.run_all(ticket,user)    
                 message = "Ticket {ticket} has been resolved. Passwords reset/account unlocked for {user}!".format(ticket =ticket, user = user)
                 status = 0
