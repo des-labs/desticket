@@ -138,7 +138,6 @@ def api_exists():
     # user, email, jira_ticket
     data = ast.literal_eval(request.data.decode('utf-8'))
     query_dict = query.main(username = data['user'], email = data['email'])
-    query_dict['jira_ticket'] = data['jira_ticket']
   
     return jsonify(query_dict)
 
