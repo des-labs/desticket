@@ -145,7 +145,6 @@ def api_exists():
 def api_search():
     data = ast.literal_eval(request.data.decode('utf-8'))
     results = {'message': query.search(data['search_string'])}
-    print(results) 
     return jsonify(results)
 
 @app.route('/api/v1/reset/',methods=['GET','POST'])
