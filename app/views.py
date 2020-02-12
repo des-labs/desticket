@@ -133,7 +133,7 @@ def manual_reset(user=None,unlock=True,reset=False):
 
 
 ### API CALLS ###
-@app.route('/api/v1/exists/',methods=['GET'])
+@app.route('/api/v1/exists/',methods=['GET','POST'])
 def api_exists():
     # user, email, jira_ticket
     data = ast.literal_eval(request.data.decode('utf-8'))
@@ -141,14 +141,14 @@ def api_exists():
   
     return jsonify(query_dict)
 
-@app.route('/api/v1/search/',methods=['GET'])
+@app.route('/api/v1/search/',methods=['GET','POST'])
 def api_search():
     data = ast.literal_eval(request.data.decode('utf-8'))
     results = {'message': query.search(data['search_string'])}
-   
+    print(results) 
     return jsonify(results)
 
-@app.route('/api/v1/reset/',methods=['GET'])
+@app.route('/api/v1/reset/',methods=['GET','POST'])
 def api_reset():
     # user, email, jira_ticket, reset
     data = ast.literal_eval(request.data.decode('utf-8'))
