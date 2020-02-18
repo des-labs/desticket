@@ -157,7 +157,7 @@ def api_reset():
     reset = data['reset']
 
     jira = jiracmd.Jira()
-    if jira_ticket=='None' or not jira_ticket:
+    if jira_ticket=='None':
         issues = jira.search_for_issue(email)
         ticket = None
         if len(issues) > 1:
@@ -167,7 +167,7 @@ def api_reset():
             status = 1
         elif len(issues) == 0:
             try:
-                if reset or reset == 'True':
+                if reset == 'True':
                     resolve.run_manual(user = user, email = email, name = user)
                     message = "Password reset/account unlocked for {user}!".format(user= user)
                     status = 0
@@ -187,7 +187,7 @@ def api_reset():
     # run resolve here...
     if ticket:
         try:
-            if reset or reset == 'True':
+            if reset == 'True':
                 resolve.run_all(ticket,user)    
                 message = "Ticket {ticket} has been resolved. Passwords reset/account unlocked for {user}!".format(ticket =ticket, user = user)
                 status = 0
