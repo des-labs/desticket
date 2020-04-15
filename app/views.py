@@ -59,7 +59,7 @@ def form_submission(user=None,email=None,jira_ticket=None,count=None):
         jira = jiracmd.Jira()
         jira_ticket=request.args.get('jira_ticket')
         user = request.args.get('user')
-        if jira_ticket and jira_ticket !='None' and jira_ticket !='':
+        if jira_ticket and (jira_ticket !='None' or jira_ticket !=''):
             ticket = str(jira_ticket)
         else:
             issues = jira.search_for_issue(request.args.get('email'))
