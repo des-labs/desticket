@@ -76,7 +76,7 @@ def form_submission(user=None,email=None,jira_ticket=None,count=None):
                 ticket = issues[0].key.split('-')[1]
         # run resolve here...
         try:
-            if reset == 'True':
+            if reset.lower() == 'true':
                 resolve.run_all(ticket,user)    
                 message = "Ticket {ticket} has been resolved. Passwords reset/account unlocked for {user}!".format(ticket =ticket, user = user)
             else:
